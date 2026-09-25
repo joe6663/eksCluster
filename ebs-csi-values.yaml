@@ -1,0 +1,6 @@
+controller:
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "system_pods"
+      effect: "NoSchedule"

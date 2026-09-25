@@ -1,0 +1,51 @@
+
+# scheduling rules specifically for the core components
+global:
+  domain: ""
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "system_pods"
+      effect: "NoSchedule"
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: "role"
+                operator: "In"
+                values:
+                  - "system"
+
+###################################################################################################
+
+configs:
+  params:
+    # Tells Argo CD to disable internal SSL so the AWS ALB can handle it cleanly
+    server.insecure: "true"
+
+server:
+  ingress:
+    enabled: true
+    ingressClassName: "alb"
+    annotations:
+      # Provisions a public, internet-facing load balancer
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      # Directs traffic straight to pod IPs (Best practice for EKS VPC CNI)
+      alb.ingress.kubernetes.io/target-type: ip
+      # Essential: Maps the correct path for Argo CD's health check endpoint
+      alb.ingress.kubernetes.io/healthcheck-path: /healthz
+      alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+      # Configure listening ports (Uncomment certificate-arn when you add your ACM SSL)
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+      # alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+      # alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:REGION:ACCOUNT:certificate/YOUR-CERT-ID"
+      # alb.ingress.kubernetes.io/ssl-redirect: '443'
+    
+    hosts: 
+      # raw alb address will be used for now, but you can add your own domain here if you want to use a custom domain name
+      - "*"
+
+    paths:
+      - /

@@ -61,6 +61,8 @@ Run the Terraform lifecycle commands from the project root directory:
 
 **initialize providers and modules**
 
+Run the terraform code https://github.com/joe6663/terraform-execution-role.git to create user, role and policy which will be used to create the cluster
+
 terraform init
 
 **Review execution plan**

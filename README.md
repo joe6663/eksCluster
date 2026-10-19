@@ -5,9 +5,13 @@
 
 2. **Key Components**
 2.1 Networking (VPC)
+   
     • Region & AZs: AWS Region us-east-1 spanning 3 Availability Zones (us-east-1a, us-east-1b, us-east-1c).
+   
     • Subnet Strategy: Public subnets (tagged 'kubernetes.io/role/elb = 1') and private subnets (tagged 'kubernetes.io/role/internal-elb = 1') across all three AZs.
+   
     • NAT Gateways: Multi-AZ NAT Gateways deployed in public subnets ensure highly available and fault-tolerant outbound connectivity for private worker nodes.
+   
 2.2 EKS Managed Node Groups
     • System Node Group (prod-system-nodes): Configured with capacityType = ON_DEMAND.
     •  Dedicated taint: 'dedicated=system:NoSchedule'.
@@ -23,7 +27,7 @@
     • DevOps Team: Bound to ClusterRole: dev with cluster-wide permissions to list pods, nodes, and cluster-level resources.
     • App Developers: Bound to Role: variable-access scoped strictly to the 'app-ns' namespace with permissions to read/list Secrets and ConfigMaps
 
-3. **Deployment Instructions**
+4. **Deployment Instructions**
 Step 1: Remote State Setup
 Ensure your remote state S3 bucket and DynamoDB/Lockfile settings are configured in backend.tf:
 terraform {

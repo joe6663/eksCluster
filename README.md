@@ -59,15 +59,15 @@ Step 2: Initialize and Apply
 
 Run the Terraform lifecycle commands from the project root directory:
 
-# Initialize providers and modules
+**initialize providers and modules**
 
 terraform init
 
-# Review execution plan
+**Review execution plan**
 
 terraform plan
 
-# Apply infrastructure changes
+**Apply infrastructure changes**
 
 terraform apply
 
@@ -75,14 +75,14 @@ Step 3: Configure kubectl Access
 
 Update your local kubeconfig to assume the Terraform deployment role:
 
-# Authenticate using the deployment role
+ **Authenticate using the deployment role**
 
 aws eks update-kubeconfig \
   --name eks-cluster \
   --region us-east-1 \
   --role-arn arn:aws:iam::<ACCOUNT_ID>:role/dev-terraform-execution-role
 
-# Verify node connectivity across both node groups
+**Verify node connectivity across both node groups**
 
 kubectl get nodes -L eks.amazonaws.com/capacityType,role
 
@@ -128,15 +128,15 @@ tolerations:
    
 Verify authorization boundaries across personas using the kubectl auth can-i command:
 
-# Check developer permissions in app-ns (Expected: yes)
+**Check developer permissions in app-ns (Expected: yes)**
 
 kubectl auth can-i get secrets -n app-ns --as=arn:aws:iam::<ACCOUNT_ID>:role/dev_user_role
 
-# Check developer permissions outside scope (Expected: no)
+**Check developer permissions outside scope (Expected: no)**
 
 kubectl auth can-i list pods -n app-ns --as=arn:aws:iam::<ACCOUNT_ID>:role/dev_user_role
 
-# Check DevOps permissions for cluster-wide node access (Expected: yes)
+**Check DevOps permissions for cluster-wide node access (Expected: yes)**
 
 kubectl auth can-i list nodes --as=arn:aws:iam::<ACCOUNT_ID>:role/dev_namespaced_role
 
@@ -146,17 +146,17 @@ kubectl auth can-i list nodes --as=arn:aws:iam::<ACCOUNT_ID>:role/dev_namespaced
 Important Teardown Sequence: Always remove in-cluster Ingresses and LoadBalancer Services before running terraform destroy. If active ALBs hold VPC subnets or security groups, AWS will reject the subnet and VPC deletion calls.
 
 
-# 1. Delete all deployed Ingresses and LoadBalancer services
+**1. Delete all deployed Ingresses and LoadBalancer services**
 
 kubectl delete ingress -A --all
 kubectl delete svc -A --field-selector spec.type=LoadBalancer
 
-# 2. Scale node groups to 0 (prevents Auto Scaling race conditions during teardown)
+**2. Scale node groups to 0 (prevents Auto Scaling race conditions during teardown)**
 
 aws eks update-nodegroup-config --cluster-name eks-cluster --nodegroup-name <SYSTEM_NODEGROUP_NAME> --scaling-config minSize=0,maxSize=1,desiredSize=0
 aws eks update-nodegroup-config --cluster-name eks-cluster --nodegroup-name <APP_NODEGROUP_NAME> --scaling-config minSize=0,maxSize=1,desiredSize=0
 
-# 3. Destroy infrastructure via Terraform
+**3. Destroy infrastructure via Terraform**
 
 terraform destroy
 

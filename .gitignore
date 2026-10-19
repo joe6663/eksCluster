@@ -13,6 +13,5 @@
 *.tfstate.*
 
 *.log
-*.tfvars
 *.tfvars.json
 .terraform.tfstate.lock.info

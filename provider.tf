@@ -24,10 +24,14 @@ terraform {
 }
 
 provider "aws" {
-  region     = var.aws_region_2
+  region = var.aws_region_2
+  /*
   access_key = var.aws_access_key_2
   secret_key = var.aws_secret_key_2
-
+  */
+  assume_role {
+    role_arn = "arn:aws:iam::899042279834:role/dev-terraform-execution-role"
+  }
 }
 
 provider "kubernetes" {
